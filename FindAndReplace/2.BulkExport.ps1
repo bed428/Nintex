@@ -7,13 +7,11 @@ Prerequisites:
     Credentials with sufficient permissions.
 #>
 
-
 # --- CONFIGURATION ---
     $inventoryCsvPath = "C:\Temp\NintexWorkflowInventory.csv"
     $exportBasePath = "C:\Temp\NintexExport"
     $nwadminPath = "C:\Program Files\Common Files\microsoft shared\Web Server Extensions\16\BIN\NWAdmin.exe"
 # ---------------------
-
 
 # --- Import the workflow inventory ---
     if (-not (Test-Path $inventoryCsvPath))
@@ -23,9 +21,6 @@ Prerequisites:
     }
     $workflowsToExport = Import-Csv -Path $inventoryCsvPath
 # ---------------------
-
-
-
 
 Write-Host "`n`nStarting bulk export of $($workflowsToExport.Count) workflows..." -F Magenta
 $count = 0
@@ -38,21 +33,17 @@ foreach ($workflow in $workflowsToExport) {
         Write-Host "`n$siteurl" -F Cyan
     }
 
-
     #Parameters.
     $listName = $workflow.ListName -replace "&amp;","&" -replace "&#39;","'" #Noticed some issues with special characters in list names. Add more here and in other scripts also if it becomes an issue.
     $workflowName = $workflow.WorkflowName
     $workflowType = $workflow.WorkflowType
 
-
     Write-Host "`t$count - $workflowName`t- " -NoNewLine
-
 
     # Sanitize parts of the path to be file-system friendly
     $safeSitePath = $siteUrl -replace "http://", "" -replace "https://", "" -replace "[:/]", "_"
     $safeListPath = $listName -replace "[:/]", "_"
     $safeWorkflowName = $workflowName -replace "[:/]", "_"
-
 
     # Create a structured output directory
     $outputDir = Join-Path -Path $exportBasePath -ChildPath (Join-Path -Path $safeSitePath -ChildPath $safeListPath)
@@ -61,7 +52,6 @@ foreach ($workflow in $workflowsToExport) {
         New-Item -Path $outputDir -ItemType Directory -Force | Out-Null
     }
     $outputFile = Join-Path -Path $outputDir -ChildPath "$($safeWorkflowName).nwf"
-
 
     try
     {
@@ -76,6 +66,3 @@ foreach ($workflow in $workflowsToExport) {
 
 
 Write-Host "`nBULK EXPORT PROCESS COMPLETE" -F Green  
-
-
-
