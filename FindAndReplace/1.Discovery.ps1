@@ -7,12 +7,10 @@ Prerequisites:
     Nintex licensed.
 #>
 
-
 # --- CONFIGURATION ---
     $nwadminPath = "C:\Program Files\Common Files\microsoft shared\Web Server Extensions\16\BIN\NWAdmin.exe"
     $outputCsvPath = "C:\Temp\NintexWorkflowInventory.csv"
 # ---------------------
-
 
 # Verify nwadmin.exe exists
     if (-not (Test-Path $nwadminPath)) {
@@ -20,13 +18,10 @@ Prerequisites:
         return
     }
 
-
 # Execute nwadmin to get the raw workflow list
 $foundWorkflows = & $nwadminPath -o FindWorkflows
 
-
-
-
+#Core Logic
 $workflowInventory = @()
 $currentSite = ""
 $currentList = ""
@@ -44,13 +39,11 @@ foreach ($line in $foundWorkflows) {
     elseif ($line.StartsWith("---- ")) {
         $workflowName = $line.Replace("---- ", "").Trim()
 
-
         # Determine workflow type based on list name
         $workflowType = 'List'
         if ($currentList -eq "Site Workflow") { $workflowType = 'Site' }
         if ($currentList -eq "Reusable workflow template") { $workflowType = 'Reusable' }
         if ($currentList -eq "Site collection reusable workflow template") { $workflowType = 'GloballyReusable' }
-
 
         # Create a structured object for the workflow
         $workflowObject =@{
@@ -63,11 +56,8 @@ foreach ($line in $foundWorkflows) {
     }
 }
 
-
 # Export the inventory to a CSV file
     $workflowInventory | Export-Csv -Path $outputCsvPath -NoTypeInformation -Force
 
-
 Write-Host "`n`nDiscovery complete. Inventory saved to '$outputCsvPath'" -F Green
 Write-Host "Total workflows found: $($workflowInventory.Count)"
-
